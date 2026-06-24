@@ -1,0 +1,52 @@
+requirements:
+  - id: SCS-PARSE-001
+    title: Parse requirements.yaml
+    description: "Service MUST read requirements.yaml from the project root and validate that every entry contains id, title, and description fields."
+    
+  - id: SCS-PARSE-002
+    title: Parse tasks.yaml
+    description: "Service MUST read tasks.yaml from the project root and validate that every entry contains id, requirementId, title, and status fields."
+
+  - id: SCS-SCAN-001
+    title: Multi-language annotation scanning
+    description: "Scanner MUST recursively find all @req annotations in .rs, .ts, .js, .py, .dart, and .go files, respecting language-specific comment syntax (// or #)."
+    
+  - id: SCS-SCAN-002
+    title: Implementation vs Test classification
+    description: "Scanner MUST classify each @req annotation as 'impl' or 'test' based on file path patterns (test_*, *_test.*, *.test.*)."
+
+  - id: SCS-COV-001
+    title: Per-requirement coverage status
+    description: "Service MUST calculate coverage status for each requirement as 'covered' (has impl and test), 'partial' (has only impl or test), or 'missing' (no annotations)."
+    
+  - id: SCS-COV-002
+    title: Orphan detection
+    description: "Service MUST detect and report orphan annotations (referencing non-existent requirement IDs) and orphan tasks (referencing non-existent requirement IDs)."
+    
+  - id: SCS-COV-003
+    title: Project-level summary
+    description: "Service MUST compute an aggregate summary including total requirements, counts by status (covered/partial/missing), and overall coverage percentage."
+
+  - id: SCS-API-001
+    title: Flat API routing
+    description: "REST API MUST be single-project and flat, exposing endpoints directly at the root level (e.g., /stats, /requirements) without nested /projects routing."
+    
+  - id: SCS-API-002
+    title: Required endpoints and async scanning
+    description: "Service MUST implement flat endpoints. POST /scan MUST return 202 Accepted immediately and trigger background scanning. GET /scan MUST return current status for polling."
+
+  - id: SCS-ERR-001
+    title: Graceful failure and no panics
+    description: "Service MUST NOT panic under any input. It MUST return clear errors with line numbers for malformed YAML, and skip inaccessible directories with a warning."
+
+  - id: SCS-HOST-001
+    title: Self-hosting verification
+    description: "Service MUST be able to scan its own codebase. Running the strict self-hosting check on the repository MUST pass with zero traceability violations."
+
+  - id: SCS-TEST-001
+    title: Test traceability
+    description: "Every unit and integration test function MUST include a /// @req SCS-XXX-NNN doc-comment linking to the specific requirement it verifies."
+
+  - id: SCS-CLI-001
+    title: CLI execution mode
+    description: "Service MUST provide a CLI command (e.g., sdd-coverage scan) that executes the scanner and outputs results to stdout or a file."

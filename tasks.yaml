@@ -1,0 +1,30 @@
+tasks:
+  - id: TASK-001
+    requirementId: SCS-PARSE-001
+    title: "Implement requirements.yaml and tasks.yaml parser with serde"
+    status: done
+
+  - id: TASK-002
+    requirementId: SCS-SCAN-001
+    title: "Build recursive file scanner with ignore crate"
+    status: done
+
+  - id: TASK-003
+    requirementId: SCS-SCAN-002
+    title: "Write regex-based annotation extractor and classifier"
+    status: in_progress
+
+  - id: TASK-004
+    requirementId: SCS-API-001
+    title: "Set up axum router with flat endpoints"
+    status: open
+
+  - id: TASK-005
+    requirementId: SCS-API-002
+    title: "Implement GET /stats and POST /scan endpoints"
+    status: open
+
+  - id: TASK-006
+    requirementId: SCS-TEST-001
+    title: "Write integration tests with strict @req traceability"
+    status: open
