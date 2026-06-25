@@ -197,6 +197,6 @@ fn test_parse_actual_project_files() {
     assert_eq!(reqs.len(), 13);
     assert_eq!(reqs[0].id, "SCS-PARSE-001");
     let tasks = parse_tasks(Path::new("../tasks.yaml")).unwrap();
-    assert_eq!(tasks.len(), 6);
+    assert_eq!(tasks.len(), 7);
     assert_eq!(tasks[0].id, "TASK-001");
 }

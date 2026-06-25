@@ -48,9 +48,5 @@ requirements:
     description: "Every unit and integration test function MUST include a /// @req SCS-XXX-NNN doc-comment linking to the specific requirement it verifies."
 
   - id: SCS-CLI-001
-    title: CLI execution mode
-    description: "Service MUST provide a CLI command (e.g., sdd-coverage scan) that executes the scanner and outputs results to stdout or a file."
-
-  - id: SCS-CLI-001
     title: CLI execution mode and strict flag
     description: "Service MUST provide a CLI `scan` command accepting exactly `--requirements`, `--source`, `--tests`, and `--strict` flags. With `--strict`, the CLI MUST exit with code 1 on any traceability violation to enable automated self-hosting checks."

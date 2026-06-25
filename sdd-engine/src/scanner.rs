@@ -19,7 +19,7 @@ pub struct ScanResult {
 /// @req SCS-SCAN-002
 /// @req SCS-ERR-001
 pub fn scan_directory(root: &Path) -> Result<ScanResult, AppError> {
-    let re = Regex::new(r"@req\s+(\S+)").map_err(|e| AppError::Regex {
+    let re = Regex::new(r"@req\s+([A-Z]+-[A-Z]+-\d+)").map_err(|e| AppError::Regex {
         message: e.to_string(),
     })?;
 
