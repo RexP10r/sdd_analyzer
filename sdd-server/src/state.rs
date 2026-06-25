@@ -36,6 +36,7 @@ impl AppStateInner {
     }
 }
 
+/// @req SCS-API-002
 impl Default for AppStateInner {
     fn default() -> Self {
         Self::new()

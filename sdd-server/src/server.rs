@@ -9,8 +9,8 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use sdd_core::models::{Annotation, Classification};
 use sdd_core::models::Task;
+use sdd_core::models::{Annotation, Classification, CoverageStatus};
 use sdd_engine::coverage::{compute_project_stats, compute_requirement_status};
 
 use crate::state::{AppState, ScanStatus};
@@ -177,9 +177,9 @@ async fn get_stats(State(state): State<AppState>) -> Json<StatsResponse> {
     let stats = compute_project_stats(&inner.requirements, &inner.annotations, &inner.tasks);
 
     let mut by_status = std::collections::HashMap::new();
-    by_status.insert("covered".to_string(), stats.covered);
-    by_status.insert("partial".to_string(), stats.partial);
-    by_status.insert("missing".to_string(), stats.missing);
+    by_status.insert(CoverageStatus::Covered.as_str().to_string(), stats.covered);
+    by_status.insert(CoverageStatus::Partial.as_str().to_string(), stats.partial);
+    by_status.insert(CoverageStatus::Missing.as_str().to_string(), stats.missing);
 
     let mut task_by_status = std::collections::HashMap::new();
     task_by_status.insert("open".to_string(), stats.tasks_open);
@@ -324,9 +324,7 @@ async fn get_annotations(
                     return false;
                 }
             }
-            if query.orphans.unwrap_or(false)
-                && req_ids.contains(&a.requirement_id)
-            {
+            if query.orphans.unwrap_or(false) && req_ids.contains(&a.requirement_id) {
                 return false;
             }
             true
@@ -354,9 +352,7 @@ async fn get_tasks(
                     return false;
                 }
             }
-            if query.orphans.unwrap_or(false)
-                && req_ids.contains(&t.requirement_id)
-            {
+            if query.orphans.unwrap_or(false) && req_ids.contains(&t.requirement_id) {
                 return false;
             }
             true
@@ -444,10 +440,11 @@ async fn get_scan_status(State(state): State<AppState>) -> Json<ScanStatusRespon
 /// @req SCS-API-002
 /// @req SCS-ERR-001
 async fn run_scan(state: AppState) {
-    let requirements = sdd_engine::parser::parse_requirements(std::path::Path::new("../requirements.yaml"))
-        .unwrap_or_default();
-    let tasks = sdd_engine::parser::parse_tasks(std::path::Path::new("../tasks.yaml"))
-        .unwrap_or_default();
+    let requirements =
+        sdd_engine::parser::parse_requirements(std::path::Path::new("../requirements.yaml"))
+            .unwrap_or_default();
+    let tasks =
+        sdd_engine::parser::parse_tasks(std::path::Path::new("../tasks.yaml")).unwrap_or_default();
     let scan_result = sdd_engine::scanner::scan_directory(std::path::Path::new(".."))
         .unwrap_or_else(|e| {
             tracing::warn!("Scan error: {}", e);
@@ -477,7 +474,13 @@ fn chrono_now() -> String {
 
     format!(
         "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z",
-        y, m, d, h, min, s, nsecs / 1_000_000
+        y,
+        m,
+        d,
+        h,
+        min,
+        s,
+        nsecs / 1_000_000
     )
 }
 

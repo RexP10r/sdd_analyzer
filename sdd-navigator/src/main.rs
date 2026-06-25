@@ -28,7 +28,12 @@ async fn main() {
 
 /// @req SCS-CLI-001
 /// @req SCS-HOST-001
-fn run_scan(requirements_path: std::path::PathBuf, source_dir: std::path::PathBuf, show_tests: bool, strict: bool) {
+fn run_scan(
+    requirements_path: std::path::PathBuf,
+    source_dir: std::path::PathBuf,
+    show_tests: bool,
+    strict: bool,
+) {
     use std::collections::HashSet;
 
     let reqs = match sdd_engine::parser::parse_requirements(&requirements_path) {
@@ -57,7 +62,8 @@ fn run_scan(requirements_path: std::path::PathBuf, source_dir: std::path::PathBu
 
     // Per-requirement coverage
     for req in &reqs {
-        let status = sdd_engine::coverage::compute_requirement_status(&req.id, &scan_result.annotations);
+        let status =
+            sdd_engine::coverage::compute_requirement_status(&req.id, &scan_result.annotations);
         let impl_count = scan_result
             .annotations
             .iter()
@@ -89,11 +95,7 @@ fn run_scan(requirements_path: std::path::PathBuf, source_dir: std::path::PathBu
 
         println!(
             "[{}] {}  (impl: {}, test: {})  {}",
-            marker,
-            req.id,
-            impl_count,
-            test_count,
-            req.title
+            marker, req.id, impl_count, test_count, req.title
         );
     }
 
@@ -136,20 +138,23 @@ fn run_scan(requirements_path: std::path::PathBuf, source_dir: std::path::PathBu
     }
 
     // Summary
-    let stats = sdd_engine::coverage::compute_project_stats(&reqs, &scan_result.annotations, &tasks);
+    let stats =
+        sdd_engine::coverage::compute_project_stats(&reqs, &scan_result.annotations, &tasks);
     println!();
     println!("=== Summary ===");
-    println!("Requirements: {} (covered: {}, partial: {}, missing: {})",
-        stats.total_requirements, stats.covered, stats.partial, stats.missing);
     println!(
-        "Coverage: {:.1}%",
-        stats.coverage_pct
+        "Requirements: {} (covered: {}, partial: {}, missing: {})",
+        stats.total_requirements, stats.covered, stats.partial, stats.missing
     );
+    println!("Coverage: {:.1}%", stats.coverage_pct);
     println!(
         "Annotations: {} (impl: {}, test: {})",
         stats.total_annotations, stats.impl_count, stats.test_count
     );
-    println!("Orphans: {} annotations, {} tasks", stats.orphan_annotations, stats.orphan_tasks);
+    println!(
+        "Orphans: {} annotations, {} tasks",
+        stats.orphan_annotations, stats.orphan_tasks
+    );
 
     if !scan_result.warnings.is_empty() {
         println!("\n=== Warnings ===");
@@ -159,7 +164,10 @@ fn run_scan(requirements_path: std::path::PathBuf, source_dir: std::path::PathBu
     }
 
     if strict && violations > 0 {
-        eprintln!("\nFAIL: {} traceability violation(s) found (--strict mode)", violations);
+        eprintln!(
+            "\nFAIL: {} traceability violation(s) found (--strict mode)",
+            violations
+        );
         std::process::exit(1);
     }
 }

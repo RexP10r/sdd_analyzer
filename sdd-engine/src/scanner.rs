@@ -9,6 +9,33 @@ use sdd_core::models::{AnnotatedLocation, Classification};
 const SCAN_EXTENSIONS: &[&str] = &["rs", "ts", "js", "py", "dart", "go"];
 
 /// @req SCS-SCAN-001
+struct CommentRegexes {
+    slash: Regex,
+    hash: Regex,
+}
+
+impl CommentRegexes {
+    fn compile() -> Result<Self, AppError> {
+        let slash =
+            Regex::new(r"//[/!]?\s*@req\s+([A-Z]+-[A-Z]+-\d+)").map_err(|e| AppError::Regex {
+                message: e.to_string(),
+            })?;
+        let hash = Regex::new(r"#\s*@req\s+([A-Z]+-[A-Z]+-\d+)").map_err(|e| AppError::Regex {
+            message: e.to_string(),
+        })?;
+        Ok(CommentRegexes { slash, hash })
+    }
+
+    fn for_ext(&self, ext: &str) -> &Regex {
+        if ext == "py" {
+            &self.hash
+        } else {
+            &self.slash
+        }
+    }
+}
+
+/// @req SCS-SCAN-001
 /// @req SCS-SCAN-002
 pub struct ScanResult {
     pub annotations: Vec<AnnotatedLocation>,
@@ -19,9 +46,7 @@ pub struct ScanResult {
 /// @req SCS-SCAN-002
 /// @req SCS-ERR-001
 pub fn scan_directory(root: &Path) -> Result<ScanResult, AppError> {
-    let re = Regex::new(r"@req\s+([A-Z]+-[A-Z]+-\d+)").map_err(|e| AppError::Regex {
-        message: e.to_string(),
-    })?;
+    let regexes = CommentRegexes::compile()?;
 
     let mut annotations = Vec::new();
     let mut warnings = Vec::new();
@@ -48,16 +73,14 @@ pub fn scan_directory(root: &Path) -> Result<ScanResult, AppError> {
         let content = match std::fs::read_to_string(file_path) {
             Ok(c) => c,
             Err(e) => {
-                warnings.push(format!(
-                    "Cannot read '{}': {}",
-                    file_path.display(),
-                    e
-                ));
+                warnings.push(format!("Cannot read '{}': {}", file_path.display(), e));
                 continue;
             }
         };
 
         let classification = classify(file_path);
+        let ext = file_path.extension().and_then(|e| e.to_str()).unwrap_or("");
+        let re = regexes.for_ext(ext);
 
         for (line_idx, line) in content.lines().enumerate() {
             for caps in re.captures_iter(line) {
@@ -94,14 +117,8 @@ fn is_scan_target(path: &Path) -> bool {
 /// @req SCS-SCAN-002
 fn classify(path: &Path) -> Classification {
     let path_str = path.to_string_lossy();
-    let file_stem = path
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .unwrap_or("");
-    let ext = path
-        .extension()
-        .and_then(|e| e.to_str())
-        .unwrap_or("");
+    let file_stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
     if file_stem.starts_with("test_")
         || file_stem.ends_with("_test")
@@ -165,13 +182,19 @@ mod tests {
     #[test]
     fn test_scan_finds_annotations_in_own_codebase() {
         let result = scan_directory(Path::new("..")).unwrap();
-        assert!(!result.annotations.is_empty(), "Must find @req annotations in own codebase");
+        assert!(
+            !result.annotations.is_empty(),
+            "Must find @req annotations in own codebase"
+        );
         let req_ids: Vec<_> = result
             .annotations
             .iter()
             .filter(|a| a.requirement_id == "SCS-SCAN-001")
             .collect();
-        assert!(!req_ids.is_empty(), "Must find at least one @req SCS-SCAN-001");
+        assert!(
+            !req_ids.is_empty(),
+            "Must find at least one @req SCS-SCAN-001"
+        );
     }
 
     /// @req SCS-SCAN-001

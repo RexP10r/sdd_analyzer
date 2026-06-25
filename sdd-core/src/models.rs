@@ -10,8 +10,9 @@ pub struct Requirement {
     pub description: String,
 }
 
+/// @req SCS-PARSE-001
 impl Requirement {
-    /// Extract type from ID: "SCS-PARSE-001" → "SCS"
+    /// @req SCS-PARSE-001
     pub fn req_type(&self) -> &str {
         self.id.split('-').next().unwrap_or("UNKNOWN")
     }
@@ -74,6 +75,7 @@ pub struct Annotation {
     pub snippet: String,
 }
 
+/// @req SCS-SCAN-001
 impl From<&AnnotatedLocation> for Annotation {
     fn from(loc: &AnnotatedLocation) -> Self {
         Annotation {
@@ -97,7 +99,9 @@ pub enum CoverageStatus {
     Missing,
 }
 
+/// @req SCS-COV-001
 impl CoverageStatus {
+    /// @req SCS-COV-001
     pub fn as_str(&self) -> &'static str {
         match self {
             CoverageStatus::Covered => "covered",

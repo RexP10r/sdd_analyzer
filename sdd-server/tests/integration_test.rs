@@ -353,10 +353,7 @@ async fn test_post_scan_returns_202() {
 #[tokio::test]
 async fn test_get_scan_status_idle() {
     let app = build_app();
-    let req = Request::builder()
-        .uri("/scan")
-        .body(Body::empty())
-        .unwrap();
+    let req = Request::builder().uri("/scan").body(Body::empty()).unwrap();
     let resp = app.oneshot(req).await.unwrap();
     assert_eq!(resp.status(), 200);
     let body = resp.into_body().collect().await.unwrap().to_bytes();
@@ -370,14 +367,11 @@ async fn test_get_scan_status_idle() {
 /// @req SCS-TEST-001
 #[test]
 fn test_self_hosting_all_requirements_annotated() {
-    let reqs = sdd_engine::parser::parse_requirements(
-        std::path::Path::new("../requirements.yaml"),
-    )
-    .unwrap();
+    let reqs = sdd_engine::parser::parse_requirements(std::path::Path::new("../requirements.yaml"))
+        .unwrap();
     let result = sdd_engine::scanner::scan_directory(std::path::Path::new("..")).unwrap();
 
-    let req_ids: std::collections::HashSet<String> =
-        reqs.iter().map(|r| r.id.clone()).collect();
+    let req_ids: std::collections::HashSet<String> = reqs.iter().map(|r| r.id.clone()).collect();
 
     for req_id in &req_ids {
         let found = result
@@ -412,7 +406,8 @@ fn test_parse_requirements_yaml() {
 /// @req SCS-TEST-001
 #[test]
 fn test_parse_tasks_yaml() {
-    let yaml = "tasks:\n  - id: T-001\n    requirementId: REQ-001\n    title: Task\n    status: open\n";
+    let yaml =
+        "tasks:\n  - id: T-001\n    requirementId: REQ-001\n    title: Task\n    status: open\n";
     let dir = std::env::temp_dir().join("sdd_test_parse_task");
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("task.yaml");

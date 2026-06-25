@@ -14,8 +14,12 @@ pub fn compute_requirement_status(
         .filter(|a| a.requirement_id == requirement_id)
         .collect();
 
-    let has_impl = relevant.iter().any(|a| a.classification == Classification::Impl);
-    let has_test = relevant.iter().any(|a| a.classification == Classification::Test);
+    let has_impl = relevant
+        .iter()
+        .any(|a| a.classification == Classification::Impl);
+    let has_test = relevant
+        .iter()
+        .any(|a| a.classification == Classification::Test);
 
     match (has_impl, has_test) {
         (true, true) => CoverageStatus::Covered,
@@ -37,10 +41,7 @@ pub fn find_orphan_annotations(
 }
 
 /// @req SCS-COV-002
-pub fn find_orphan_tasks(
-    tasks: &[Task],
-    requirement_ids: &HashSet<String>,
-) -> Vec<Task> {
+pub fn find_orphan_tasks(tasks: &[Task], requirement_ids: &HashSet<String>) -> Vec<Task> {
     tasks
         .iter()
         .filter(|t| !requirement_ids.contains(&t.requirement_id))

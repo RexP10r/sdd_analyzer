@@ -141,7 +141,8 @@ mod tests {
     /// @req SCS-TEST-001
     #[test]
     fn test_missing_root_key_in_tasks_fails() {
-        let yaml = "wrong:\n  - id: T-001\n    requirementId: REQ-001\n    title: T\n    status: open\n";
+        let yaml =
+            "wrong:\n  - id: T-001\n    requirementId: REQ-001\n    title: T\n    status: open\n";
         let tmp = write_temp("tasks.yaml", yaml);
         let result = parse_tasks(&tmp);
         assert!(result.is_err());
@@ -197,6 +198,6 @@ fn test_parse_actual_project_files() {
     assert_eq!(reqs.len(), 13);
     assert_eq!(reqs[0].id, "SCS-PARSE-001");
     let tasks = parse_tasks(Path::new("../tasks.yaml")).unwrap();
-    assert_eq!(tasks.len(), 7);
+    assert_eq!(tasks.len(), 8);
     assert_eq!(tasks[0].id, "TASK-001");
 }
