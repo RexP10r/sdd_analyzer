@@ -1,20 +1,8 @@
-[package]
-name = "sdd-navigator"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-serde = { version = "1", features = ["derive"] }
-serde_yml = "0.0.13"
-thiserror = "2"
-miette = "7"
-ignore = "0.4"
-regex = "1"
-tracing = "0.1"
-axum = "0.8"
-tokio = { version = "1", features = ["full"] }
-serde_json = "1"
-
-[dev-dependencies]
-tower = "0.5"
-http-body-util = "0.1"
+[workspace]
+resolver = "2"
+members = [
+    "sdd-core",
+    "sdd-engine",
+    "sdd-server",
+    "sdd-navigator",
+]

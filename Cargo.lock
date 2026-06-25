@@ -523,18 +523,47 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
+name = "sdd-core"
+version = "0.1.0"
+dependencies = [
+ "miette",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "sdd-engine"
+version = "0.1.0"
+dependencies = [
+ "ignore",
+ "regex",
+ "sdd-core",
+ "serde",
+ "serde_yml",
+ "tracing",
+]
+
+[[package]]
 name = "sdd-navigator"
+version = "0.1.0"
+dependencies = [
+ "sdd-core",
+ "sdd-engine",
+ "sdd-server",
+ "tokio",
+]
+
+[[package]]
+name = "sdd-server"
 version = "0.1.0"
 dependencies = [
  "axum",
  "http-body-util",
- "ignore",
- "miette",
- "regex",
+ "sdd-core",
+ "sdd-engine",
  "serde",
  "serde_json",
- "serde_yml",
- "thiserror",
  "tokio",
  "tower",
  "tracing",

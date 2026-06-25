@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use tokio::sync::RwLock;
 
-use crate::models::{AnnotatedLocation, Requirement, Task};
+use sdd_core::models::{AnnotatedLocation, Requirement, Task};
 
 /// @req SCS-API-002
 #[derive(Debug, Clone, PartialEq, Eq)]

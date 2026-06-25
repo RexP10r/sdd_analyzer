@@ -9,9 +9,10 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::coverage::{compute_project_stats, compute_requirement_status};
-use crate::models::Annotation;
-use crate::models::Task;
+use sdd_core::models::{Annotation, Classification};
+use sdd_core::models::Task;
+use sdd_engine::coverage::{compute_project_stats, compute_requirement_status};
+
 use crate::state::{AppState, ScanStatus};
 
 // ── Query params ─────────────────────────────────────────────
@@ -315,8 +316,8 @@ async fn get_annotations(
         .filter(|a| {
             if let Some(ref t) = query.filter_type {
                 let expected = match t.as_str() {
-                    "impl" => crate::models::Classification::Impl,
-                    "test" => crate::models::Classification::Test,
+                    "impl" => Classification::Impl,
+                    "test" => Classification::Test,
                     _ => return true,
                 };
                 if a.classification != expected {
@@ -443,14 +444,14 @@ async fn get_scan_status(State(state): State<AppState>) -> Json<ScanStatusRespon
 /// @req SCS-API-002
 /// @req SCS-ERR-001
 async fn run_scan(state: AppState) {
-    let requirements = crate::parser::parse_requirements(std::path::Path::new("requirements.yaml"))
+    let requirements = sdd_engine::parser::parse_requirements(std::path::Path::new("../requirements.yaml"))
         .unwrap_or_default();
-    let tasks = crate::parser::parse_tasks(std::path::Path::new("tasks.yaml"))
+    let tasks = sdd_engine::parser::parse_tasks(std::path::Path::new("../tasks.yaml"))
         .unwrap_or_default();
-    let scan_result = crate::scanner::scan_directory(std::path::Path::new("."))
+    let scan_result = sdd_engine::scanner::scan_directory(std::path::Path::new(".."))
         .unwrap_or_else(|e| {
             tracing::warn!("Scan error: {}", e);
-            crate::scanner::ScanResult {
+            sdd_engine::scanner::ScanResult {
                 annotations: Vec::new(),
                 warnings: vec![e.to_string()],
             }

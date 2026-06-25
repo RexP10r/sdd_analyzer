@@ -28,3 +28,8 @@ tasks:
     requirementId: SCS-TEST-001
     title: "Write integration tests with strict @req traceability"
     status: done
+
+  - id: TASK-007
+    requirementId: SCS-CLI-001
+    title: "Implement clap CLI with exact self-hosting flags and strict exit codes"
+    status: open

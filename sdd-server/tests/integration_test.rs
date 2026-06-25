@@ -1,11 +1,11 @@
 use axum::body::Body;
 use axum::http::Request;
 use http_body_util::BodyExt;
-use sdd_navigator::models::{AnnotatedLocation, Classification, Requirement, Task};
-use sdd_navigator::state::AppStateInner;
+use sdd_core::models::{AnnotatedLocation, Classification, Requirement, Task};
+use sdd_server::state::AppStateInner;
 use tower::ServiceExt;
 
-fn test_state() -> sdd_navigator::state::AppState {
+fn test_state() -> sdd_server::state::AppState {
     let mut inner = AppStateInner::new();
 
     inner.requirements = vec![
@@ -80,7 +80,7 @@ fn test_state() -> sdd_navigator::state::AppState {
 }
 
 fn build_app() -> axum::Router {
-    sdd_navigator::server::build_router(test_state())
+    sdd_server::server::build_router(test_state())
 }
 
 // ── Healthcheck ──────────────────────────────────────────────
@@ -119,22 +119,18 @@ async fn test_stats_returns_aggregate() {
     let body = resp.into_body().collect().await.unwrap().to_bytes();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
-    // Requirements
     assert_eq!(json["requirements"]["total"], 2);
     assert_eq!(json["requirements"]["byStatus"]["covered"], 1);
     assert_eq!(json["requirements"]["byStatus"]["partial"], 1);
 
-    // Annotations
     assert_eq!(json["annotations"]["total"], 4);
     assert_eq!(json["annotations"]["impl"], 3);
     assert_eq!(json["annotations"]["test"], 1);
     assert_eq!(json["annotations"]["orphans"], 1);
 
-    // Tasks
     assert_eq!(json["tasks"]["total"], 3);
     assert_eq!(json["tasks"]["orphans"], 1);
 
-    // Coverage: 1 covered / 2 total = 50%
     assert_eq!(json["coverage"], 50.0);
 }
 
@@ -153,8 +149,7 @@ async fn test_requirements_list_all() {
     assert_eq!(resp.status(), 200);
     let body = resp.into_body().collect().await.unwrap().to_bytes();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
-    let arr = json.as_array().unwrap();
-    assert_eq!(arr.len(), 2);
+    assert_eq!(json.as_array().unwrap().len(), 2);
 }
 
 /// @req SCS-API-002
@@ -170,8 +165,7 @@ async fn test_requirements_filter_by_type() {
     assert_eq!(resp.status(), 200);
     let body = resp.into_body().collect().await.unwrap().to_bytes();
     let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
-    let arr = json.as_array().unwrap();
-    assert_eq!(arr.len(), 2);
+    assert_eq!(json.as_array().unwrap().len(), 2);
 }
 
 /// @req SCS-API-002
@@ -376,11 +370,11 @@ async fn test_get_scan_status_idle() {
 /// @req SCS-TEST-001
 #[test]
 fn test_self_hosting_all_requirements_annotated() {
-    let reqs = sdd_navigator::parser::parse_requirements(
-        std::path::Path::new("requirements.yaml"),
+    let reqs = sdd_engine::parser::parse_requirements(
+        std::path::Path::new("../requirements.yaml"),
     )
     .unwrap();
-    let result = sdd_navigator::scanner::scan_directory(std::path::Path::new(".")).unwrap();
+    let result = sdd_engine::scanner::scan_directory(std::path::Path::new("..")).unwrap();
 
     let req_ids: std::collections::HashSet<String> =
         reqs.iter().map(|r| r.id.clone()).collect();

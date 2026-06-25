@@ -3,8 +3,8 @@ use std::path::Path;
 use ignore::WalkBuilder;
 use regex::Regex;
 
-use crate::error::AppError;
-use crate::models::{AnnotatedLocation, Classification};
+use sdd_core::error::AppError;
+use sdd_core::models::{AnnotatedLocation, Classification};
 
 const SCAN_EXTENSIONS: &[&str] = &["rs", "ts", "js", "py", "dart", "go"];
 
@@ -164,7 +164,7 @@ mod tests {
     /// @req SCS-TEST-001
     #[test]
     fn test_scan_finds_annotations_in_own_codebase() {
-        let result = scan_directory(Path::new(".")).unwrap();
+        let result = scan_directory(Path::new("..")).unwrap();
         assert!(!result.annotations.is_empty(), "Must find @req annotations in own codebase");
         let req_ids: Vec<_> = result
             .annotations

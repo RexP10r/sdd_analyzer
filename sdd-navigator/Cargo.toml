@@ -1,0 +1,10 @@
+[package]
+name = "sdd-navigator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sdd-server = { path = "../sdd-server" }
+sdd-engine = { path = "../sdd-engine" }
+sdd-core = { path = "../sdd-core" }
+tokio = { version = "1", features = ["full"] }

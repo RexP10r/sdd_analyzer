@@ -1,0 +1,12 @@
+[package]
+name = "sdd-engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sdd-core = { path = "../sdd-core" }
+serde = { version = "1", features = ["derive"] }
+serde_yml = "0.0.13"
+ignore = "0.4"
+regex = "1"
+tracing = "0.1"

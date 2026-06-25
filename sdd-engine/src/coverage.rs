@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::models::{
+use sdd_core::models::{
     AnnotatedLocation, Annotation, Classification, CoverageStatus, Requirement, Task,
 };
 

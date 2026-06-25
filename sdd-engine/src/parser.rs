@@ -2,8 +2,8 @@ use std::path::Path;
 
 use serde::de::DeserializeOwned;
 
-use crate::error::AppError;
-use crate::models::{Requirement, RequirementsFile, Task, TasksFile};
+use sdd_core::error::AppError;
+use sdd_core::models::{Requirement, RequirementsFile, Task, TasksFile};
 
 /// @req SCS-PARSE-001
 /// @req SCS-ERR-001
@@ -97,7 +97,6 @@ mod tests {
     /// @req SCS-TEST-001
     #[test]
     fn test_missing_key_in_requirements_fails() {
-        // Use serde_yml::Value to detect missing root key
         let yaml = "wrong_key:\n  - id: REQ-001\n    title: T\n    description: D\n";
         let tmp = write_temp("requirements.yaml", yaml);
         let result = parse_requirements(&tmp);
@@ -176,7 +175,6 @@ mod tests {
         assert!(result.is_err());
     }
 
-    /// Helper: write a temp YAML file for testing.
     fn write_temp(name: &str, content: &str) -> std::path::PathBuf {
         use std::sync::atomic::{AtomicUsize, Ordering};
         static COUNTER: AtomicUsize = AtomicUsize::new(0);
@@ -195,10 +193,10 @@ mod tests {
 /// @req SCS-TEST-001
 #[test]
 fn test_parse_actual_project_files() {
-    let reqs = parse_requirements(Path::new("requirements.yaml")).unwrap();
+    let reqs = parse_requirements(Path::new("../requirements.yaml")).unwrap();
     assert_eq!(reqs.len(), 13);
     assert_eq!(reqs[0].id, "SCS-PARSE-001");
-    let tasks = parse_tasks(Path::new("tasks.yaml")).unwrap();
+    let tasks = parse_tasks(Path::new("../tasks.yaml")).unwrap();
     assert_eq!(tasks.len(), 6);
     assert_eq!(tasks[0].id, "TASK-001");
 }
