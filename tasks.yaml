@@ -33,3 +33,8 @@ tasks:
     requirementId: SCS-CLI-001
     title: "Implement clap CLI with exact self-hosting flags and strict exit codes"
     status: done
+
+  - id: TASK-008
+    requirementId: SCS-HOST-001
+    title: "Fix all traceability violations to achieve 100% strict self-hosting pass"
+    status: done

@@ -27,6 +27,7 @@ async fn main() {
 }
 
 /// @req SCS-CLI-001
+/// @req SCS-HOST-001
 fn run_scan(requirements_path: std::path::PathBuf, source_dir: std::path::PathBuf, show_tests: bool, strict: bool) {
     use std::collections::HashSet;
 
