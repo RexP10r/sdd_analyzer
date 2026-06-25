@@ -1,7 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use sdd_core::models::{
-    AnnotatedLocation, Annotation, Classification, CoverageStatus, Requirement, Task,
+    build_req_ids, AnnotatedLocation, Annotation, Classification, CoverageStatus, Requirement,
+    Task, TASK_STATUS_DONE, TASK_STATUS_IN_PROGRESS, TASK_STATUS_OPEN,
 };
 
 /// @req SCS-COV-001
@@ -75,7 +76,7 @@ pub fn compute_project_stats(
     annotations: &[AnnotatedLocation],
     tasks: &[Task],
 ) -> ProjectStats {
-    let req_ids: HashSet<String> = requirements.iter().map(|r| r.id.clone()).collect();
+    let req_ids = build_req_ids(requirements);
 
     let mut covered = 0usize;
     let mut partial = 0usize;
@@ -112,9 +113,18 @@ pub fn compute_project_stats(
     let orphan_tasks_list = find_orphan_tasks(tasks, &req_ids);
     let orphan_tasks = orphan_tasks_list.len();
 
-    let tasks_open = tasks.iter().filter(|t| t.status == "open").count();
-    let tasks_in_progress = tasks.iter().filter(|t| t.status == "in_progress").count();
-    let tasks_done = tasks.iter().filter(|t| t.status == "done").count();
+    let tasks_open = tasks
+        .iter()
+        .filter(|t| t.status == TASK_STATUS_OPEN)
+        .count();
+    let tasks_in_progress = tasks
+        .iter()
+        .filter(|t| t.status == TASK_STATUS_IN_PROGRESS)
+        .count();
+    let tasks_done = tasks
+        .iter()
+        .filter(|t| t.status == TASK_STATUS_DONE)
+        .count();
 
     ProjectStats {
         total_requirements: total,

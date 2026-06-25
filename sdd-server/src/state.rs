@@ -14,6 +14,18 @@ pub enum ScanStatus {
 }
 
 /// @req SCS-API-002
+impl ScanStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ScanStatus::Idle => "idle",
+            ScanStatus::Scanning => "scanning",
+            ScanStatus::Completed => "completed",
+            ScanStatus::Failed(_) => "failed",
+        }
+    }
+}
+
+/// @req SCS-API-002
 pub struct AppStateInner {
     pub scan_status: ScanStatus,
     pub requirements: Vec<Requirement>,

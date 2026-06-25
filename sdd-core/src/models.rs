@@ -110,3 +110,17 @@ impl CoverageStatus {
         }
     }
 }
+
+/// @req SCS-PARSE-002
+pub const TASK_STATUS_OPEN: &str = "open";
+
+/// @req SCS-PARSE-002
+pub const TASK_STATUS_IN_PROGRESS: &str = "in_progress";
+
+/// @req SCS-PARSE-002
+pub const TASK_STATUS_DONE: &str = "done";
+
+/// @req SCS-COV-002
+pub fn build_req_ids(requirements: &[Requirement]) -> std::collections::HashSet<String> {
+    requirements.iter().map(|r| r.id.clone()).collect()
+}

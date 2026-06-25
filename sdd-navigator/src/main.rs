@@ -3,6 +3,8 @@ mod cli;
 use clap::Parser;
 
 /// @req SCS-CLI-001
+/// @req SCS-API-001
+/// @req SCS-API-002
 #[tokio::main]
 async fn main() {
     let cli = cli::Cli::parse();
@@ -52,7 +54,7 @@ fn run_scan(
         }
     };
 
-    let req_ids: HashSet<String> = reqs.iter().map(|r| r.id.clone()).collect();
+    let req_ids: HashSet<String> = sdd_core::models::build_req_ids(&reqs);
     let mut violations = 0u32;
 
     println!("=== SDD Coverage Report ===\n");

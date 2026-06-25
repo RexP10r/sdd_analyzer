@@ -1,10 +1,12 @@
 use axum::body::Body;
 use axum::http::Request;
 use http_body_util::BodyExt;
-use sdd_core::models::{AnnotatedLocation, Classification, Requirement, Task};
+use sdd_core::models::{build_req_ids, AnnotatedLocation, Classification, Requirement, Task};
 use sdd_server::state::AppStateInner;
 use tower::ServiceExt;
 
+/// @req SCS-TEST-001
+/// @req SCS-API-002
 fn test_state() -> sdd_server::state::AppState {
     let mut inner = AppStateInner::new();
 
@@ -79,6 +81,8 @@ fn test_state() -> sdd_server::state::AppState {
     std::sync::Arc::new(tokio::sync::RwLock::new(inner))
 }
 
+/// @req SCS-TEST-001
+/// @req SCS-API-001
 fn build_app() -> axum::Router {
     sdd_server::server::build_router(test_state())
 }
@@ -371,7 +375,7 @@ fn test_self_hosting_all_requirements_annotated() {
         .unwrap();
     let result = sdd_engine::scanner::scan_directory(std::path::Path::new("..")).unwrap();
 
-    let req_ids: std::collections::HashSet<String> = reqs.iter().map(|r| r.id.clone()).collect();
+    let req_ids: std::collections::HashSet<String> = build_req_ids(&reqs);
 
     for req_id in &req_ids {
         let found = result

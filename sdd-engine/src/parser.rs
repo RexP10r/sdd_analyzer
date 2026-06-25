@@ -176,6 +176,8 @@ mod tests {
         assert!(result.is_err());
     }
 
+    /// @req SCS-PARSE-001
+    /// @req SCS-TEST-001
     fn write_temp(name: &str, content: &str) -> std::path::PathBuf {
         use std::sync::atomic::{AtomicUsize, Ordering};
         static COUNTER: AtomicUsize = AtomicUsize::new(0);

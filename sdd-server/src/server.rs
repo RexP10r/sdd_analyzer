@@ -10,7 +10,10 @@ use axum::{
 use serde::{Deserialize, Serialize};
 
 use sdd_core::models::Task;
-use sdd_core::models::{Annotation, Classification, CoverageStatus};
+use sdd_core::models::{
+    Annotation, Classification, CoverageStatus, TASK_STATUS_DONE, TASK_STATUS_IN_PROGRESS,
+    TASK_STATUS_OPEN,
+};
 use sdd_engine::coverage::{compute_project_stats, compute_requirement_status};
 
 use crate::state::{AppState, ScanStatus};
@@ -182,9 +185,9 @@ async fn get_stats(State(state): State<AppState>) -> Json<StatsResponse> {
     by_status.insert(CoverageStatus::Missing.as_str().to_string(), stats.missing);
 
     let mut task_by_status = std::collections::HashMap::new();
-    task_by_status.insert("open".to_string(), stats.tasks_open);
-    task_by_status.insert("in_progress".to_string(), stats.tasks_in_progress);
-    task_by_status.insert("done".to_string(), stats.tasks_done);
+    task_by_status.insert(TASK_STATUS_OPEN.to_string(), stats.tasks_open);
+    task_by_status.insert(TASK_STATUS_IN_PROGRESS.to_string(), stats.tasks_in_progress);
+    task_by_status.insert(TASK_STATUS_DONE.to_string(), stats.tasks_done);
 
     Json(StatsResponse {
         requirements: RequirementStats {
@@ -308,7 +311,7 @@ async fn get_annotations(
     Query(query): Query<AnnotationsQuery>,
 ) -> Json<Vec<Annotation>> {
     let inner = state.read().await;
-    let req_ids: HashSet<String> = inner.requirements.iter().map(|r| r.id.clone()).collect();
+    let req_ids: HashSet<String> = sdd_core::models::build_req_ids(&inner.requirements);
 
     let results: Vec<Annotation> = inner
         .annotations
@@ -341,7 +344,7 @@ async fn get_tasks(
     Query(query): Query<TasksQuery>,
 ) -> Json<Vec<Task>> {
     let inner = state.read().await;
-    let req_ids: HashSet<String> = inner.requirements.iter().map(|r| r.id.clone()).collect();
+    let req_ids: HashSet<String> = sdd_core::models::build_req_ids(&inner.requirements);
 
     let mut results: Vec<Task> = inner
         .tasks
@@ -409,25 +412,25 @@ async fn get_scan_status(State(state): State<AppState>) -> Json<ScanStatusRespon
     let inner = state.read().await;
     match &inner.scan_status {
         ScanStatus::Idle => Json(ScanStatusResponse {
-            status: "idle".to_string(),
+            status: ScanStatus::Idle.as_str().to_string(),
             started_at: None,
             completed_at: None,
             duration: None,
         }),
         ScanStatus::Scanning => Json(ScanStatusResponse {
-            status: "scanning".to_string(),
+            status: ScanStatus::Scanning.as_str().to_string(),
             started_at: None,
             completed_at: None,
             duration: None,
         }),
         ScanStatus::Completed => Json(ScanStatusResponse {
-            status: "completed".to_string(),
+            status: ScanStatus::Completed.as_str().to_string(),
             started_at: None,
             completed_at: None,
             duration: None,
         }),
         ScanStatus::Failed(ref msg) => Json(ScanStatusResponse {
-            status: format!("failed: {}", msg),
+            status: format!("{}: {}", ScanStatus::Failed(String::new()).as_str(), msg),
             started_at: None,
             completed_at: None,
             duration: None,
