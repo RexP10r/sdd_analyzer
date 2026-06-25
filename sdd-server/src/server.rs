@@ -443,19 +443,42 @@ async fn get_scan_status(State(state): State<AppState>) -> Json<ScanStatusRespon
 /// @req SCS-API-002
 /// @req SCS-ERR-001
 async fn run_scan(state: AppState) {
+    let requirements_path =
+        std::env::var("SDD_REQUIREMENTS_PATH").unwrap_or_else(|_| "requirements.yaml".into());
+    let source_path = std::env::var("SDD_SOURCE_PATH").unwrap_or_else(|_| ".".into());
+
     let requirements =
-        sdd_engine::parser::parse_requirements(std::path::Path::new("../requirements.yaml"))
-            .unwrap_or_default();
-    let tasks =
-        sdd_engine::parser::parse_tasks(std::path::Path::new("../tasks.yaml")).unwrap_or_default();
-    let scan_result = sdd_engine::scanner::scan_directory(std::path::Path::new(".."))
-        .unwrap_or_else(|e| {
-            tracing::warn!("Scan error: {}", e);
-            sdd_engine::scanner::ScanResult {
-                annotations: Vec::new(),
-                warnings: vec![e.to_string()],
+        match sdd_engine::parser::parse_requirements(std::path::Path::new(&requirements_path)) {
+            Ok(r) => r,
+            Err(e) => {
+                let mut inner = state.write().await;
+                inner.scan_status = ScanStatus::Failed(e.to_string());
+                return;
             }
-        });
+        };
+
+    let tasks_path = std::path::Path::new(&requirements_path)
+        .parent()
+        .unwrap_or_else(|| std::path::Path::new("."))
+        .join("tasks.yaml");
+    let tasks = match sdd_engine::parser::parse_tasks(&tasks_path) {
+        Ok(t) => t,
+        Err(e) => {
+            let mut inner = state.write().await;
+            inner.scan_status = ScanStatus::Failed(e.to_string());
+            return;
+        }
+    };
+
+    let scan_result = match sdd_engine::scanner::scan_directory(std::path::Path::new(&source_path))
+    {
+        Ok(r) => r,
+        Err(e) => {
+            let mut inner = state.write().await;
+            inner.scan_status = ScanStatus::Failed(e.to_string());
+            return;
+        }
+    };
 
     let mut inner = state.write().await;
     inner.requirements = requirements;

@@ -8,4 +8,5 @@ pub mod error;
 /// @req SCS-SCAN-001
 /// @req SCS-SCAN-002
 /// @req SCS-COV-001
+/// @req SCS-COV-002
 pub mod models;
