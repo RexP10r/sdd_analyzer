@@ -67,7 +67,8 @@ pub fn scan_directory(root: &Path) -> Result<ScanResult, AppError> {
                         file_path: file_path.display().to_string(),
                         line_number: line_idx + 1,
                         requirement_id: req_id,
-                        classification: classification.clone(),
+                        classification,
+                        snippet: line.trim().to_string(),
                     });
                 }
             }
