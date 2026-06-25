@@ -527,6 +527,7 @@ name = "sdd-navigator"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "http-body-util",
  "ignore",
  "miette",
  "regex",
@@ -535,6 +536,7 @@ dependencies = [
  "serde_yml",
  "thiserror",
  "tokio",
+ "tower",
  "tracing",
 ]
 

@@ -27,4 +27,4 @@ tasks:
   - id: TASK-006
     requirementId: SCS-TEST-001
     title: "Write integration tests with strict @req traceability"
-    status: open
+    status: done
